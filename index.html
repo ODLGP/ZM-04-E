@@ -21,8 +21,28 @@ body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f0f0; col
   .page:last-child { page-break-after: avoid; }
   .no-print { display: none !important; }
 }
-@media (max-width: 230mm) {
-  .page { width: 100%; height: auto; min-height: 100vh; margin: 0; box-shadow: none; padding: 4mm 3mm; }
+@media screen and (max-width: 800px) {
+  body { background: #fff; }
+  .page {
+    width: 100%;
+    height: auto;
+    min-height: unset;
+    margin: 0;
+    box-shadow: none;
+    padding: 4vw 3vw;
+    font-size: 3.5vw;
+  }
+  .header-left { min-width: unset; }
+  .header-left .zapis-id { font-size: 6vw; }
+  .header-left .zapis-id input { font-size: 4vw; width: 22vw; }
+  .header-right img { height: 10vw; }
+  .section-title { font-size: 4vw; }
+  .form-cell { padding: 2vw 2vw; }
+  .form-cell label { font-size: 3vw; }
+  .form-cell input, .form-cell textarea { font-size: 3.5vw; }
+  table { font-size: 3vw; }
+  table input { font-size: 3vw; }
+  .no-print button { padding: 6px 12px; font-size: 12px; }
 }
 
 /* Header */
