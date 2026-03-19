@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1a5c1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZM-04-E">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>ZM-04-E Zapisnik o mjerenju emisija</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f0f0; color: #000; }
+.page { background: #fff; width: 210mm; height: 297mm; margin: 10mm auto; padding: 10mm 12mm; box-shadow: 0 2px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; }
+@media print {
+  body { background: #fff; }
+  .page { margin: 0; box-shadow: none; width: 100%; height: 100vh; padding: 8mm 10mm; page-break-after: always; }
+  .page:last-child { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+@media (max-width: 230mm) {
+  .page { width: 100%; height: auto; min-height: 100vh; margin: 0; box-shadow: none; padding: 4mm 3mm; }
+}
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.header-left { border: 1px solid #000; padding: 4px 8px; min-width: 320px; }
+.header-left .small { font-size: 10px; color: #555; }
+.header-left .zapis-id { font-size: 26px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+.header-left .zapis-id input { border: none; border-bottom: 1px solid #000; width: 80px; font-size: 18px; text-align: center; outline: none; }
+.header-right { display: flex; align-items: center; }
+.header-right img { height: 50px; }
+
+/* Sections */
+.section { border: 1px solid #000; margin-bottom: 8px; }
+.section.grow { flex: 1; display: flex; flex-direction: column; }
+.section.grow .section-body { flex: 1; display: flex; flex-direction: column; }
+.section-title { background: #d0d0d0; font-weight: bold; font-size: 14px; padding: 4px 8px; border-bottom: 1px solid #000; }
+.section-body { padding: 0; }
+.page-footer { margin-top: auto; padding-top: 6px; }
+
+/* Table-like rows */
+.form-row { display: flex; border-bottom: 1px solid #ccc; min-height: 28px; }
+.form-row:last-child { border-bottom: none; }
+.form-cell { flex: 1; padding: 5px 6px; border-right: 1px solid #ccc; display: flex; align-items: center; gap: 4px; min-width: 0; }
+.form-cell:last-child { border-right: none; }
+.form-cell label { font-weight: bold; white-space: nowrap; font-size: 12px; }
+.form-cell input, .form-cell textarea { border: none; border-bottom: 1px solid #aaa; flex: 1; font-size: 13px; outline: none; background: transparent; min-width: 0; max-width: 100%; font-family: Arial, sans-serif; }
+.form-cell textarea { resize: none; height: 22px; }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="no-print" style="text-align:center;padding:10px;background:#1a5c1a;position:sticky;top:0;z-index:100;">
+  <button onclick="window.print()" style="background:#fff;color:#1a5c1a;border:none;padding:8px 24px;font-size:14px;font-weight:bold;border-radius:4px;cursor:pointer;margin-right:8px;">🖨️ Ispis / PDF</button>
+  <button onclick="spremiPodatke()" style="background:#27ae60;color:#fff;border:none;padding:8px 24px;font-size:14px;font-weight:bold;border-radius:4px;cursor:pointer;margin-right:8px;">💾 Spremi</button>
+  <button onclick="ucitajPodatke()" style="background:#e67e22;color:#fff;border:none;padding:8px 24px;font-size:14px;font-weight:bold;border-radius:4px;cursor:pointer;">📂 Učitaj</button>
+</div>
+
+<!-- ===== STRANICA 1 ===== -->
+<div class="page" id="page1">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="small">Zapis (Oznaka obrasca &nbsp;-&nbsp; Broj izvještaja &nbsp;-&nbsp; Redni broj izvora)</div>
+      <div class="zapis-id">ZM-04-E &nbsp;<span>-</span>
+        <input id="broj-izvjestaja" placeholder="br. izvještaja">
+        <span>-</span>
+        <input id="redni-broj" placeholder="rb. izvora" style="width:70px;">
+      </div>
+    </div>
+    <div class="header-right">
+      <img src="logo.jpeg" alt="Dvokut Ecro">
+    </div>
+  </div>
+
+  <!-- NARUČITELJ -->
+  <div class="section">
+    <div class="section-title">Naručitelj</div>
+    <div class="section-body">
+      <div class="form-row">
+        <div class="form-cell" style="flex:2"><label>Naziv tvrtke:</label><input id="naziv-tvrtke"></div>
+        <div class="form-cell" style="flex:1"><label>OIB:</label><input id="oib"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-cell" style="flex:2"><label>Naziv pogona:</label><input id="naziv-pogona"></div>
+        <div class="form-cell" style="flex:1"><label>Adresa:</label><input id="adresa"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-cell" style="flex:2"><label>Kontakt osoba:</label><input id="kontakt-osoba"></div>
+        <div class="form-cell" style="flex:1"><label>Telefon kontakt osobe:</label><input id="telefon"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IZVOR EMISIJA -->
+  <div class="section">
+    <div class="section-title">Izvor emisija</div>
+    <div class="section-body">
+      <div class="form-row">
+        <div class="form-cell"><label>Datum mjerenja:</label><input id="datum-mjerenja" type="date"></div>
+        <div class="form-cell"><label>Pogonsko gorivo:</label><input id="pogonsko-gorivo"></div>
+        <div class="form-cell"><label>Potrošnja goriva:</label><input id="potrosnja-goriva"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-cell"><label>Kapacitet [MW]:</label><input id="kapacitet" type="number" step="0.01"></div>
+        <div class="form-cell"><label>Visina dimnjaka [m]:</label><input id="visina-dimnjaka" type="number" step="0.1"></div>
+        <div class="form-cell"><label>Sati rada na godinu:</label><input id="sati-rada" type="number"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-cell" style="flex-wrap:wrap;gap:12px;padding:6px 8px;">
+          <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="radio" name="tip-izvora" value="Toplovodni"> Toplovodni</label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="radio" name="tip-izvora" value="Parni"> Parni</label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="radio" name="tip-izvora" value="Vrelovodni"> Vrelovodni</label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="radio" name="tip-izvora" value="Plinska turbina"> Plinska turbina</label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="radio" name="tip-izvora" value="Procesna peć"> Procesna peć</label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="radio" name="tip-izvora" value="Termogen"> Termogen</label>
+          <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="radio" name="tip-izvora" value="Sušara"> Sušara</label>
+          <input id="tip-izvora-ostalo" placeholder="ostalo..." style="border:none;border-bottom:1px solid #aaa;width:120px;outline:none;font-size:13px;background:transparent;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIMNJAČA -->
+  <div class="section">
+    <div class="section-title">Dimnjača</div>
+    <div class="section-body">
+      <div style="display:flex;">
+        <div style="flex:1;border-right:1px solid #ccc;padding:6px 8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <label style="font-weight:normal;display:flex;align-items:center;gap:4px;min-width:80px;"><input type="radio" name="oblik-dimnjace" value="okrugla"> okrugla</label>
+            <label style="font-size:12px;font-weight:bold;">promjer [cm]</label>
+            <input id="promjer" type="number" step="0.1" style="width:70px;border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;background:transparent;">
+            <label style="font-size:12px;font-weight:bold;">opseg [cm]</label>
+            <input id="opseg" type="number" step="0.1" style="width:70px;border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;background:transparent;">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="font-weight:normal;display:flex;align-items:center;gap:4px;min-width:80px;"><input type="radio" name="oblik-dimnjace" value="kvadratna"> kvadratna</label>
+            <label style="font-size:12px;font-weight:bold;">strana s otvorom [cm]</label>
+            <input id="strana-s-otvorom" type="number" step="0.1" style="width:60px;border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;background:transparent;">
+            <label style="font-size:12px;font-weight:bold;">strana bez otvora [cm]</label>
+            <input id="strana-bez-otvora" type="number" step="0.1" style="width:60px;border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;background:transparent;">
+          </div>
+        </div>
+        <div style="flex:1;padding:6px 8px;display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>5 promjera od vrha dimnjaka</span>
+            <span style="display:flex;gap:12px;">
+              <label style="font-weight:normal;display:flex;align-items:center;gap:3px;"><input type="radio" name="5-vrh" value="DA"> DA</label>
+              <label style="font-weight:normal;display:flex;align-items:center;gap:3px;"><input type="radio" name="5-vrh" value="NE"> NE</label>
+            </span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>2 promjera prije prve sljedeće prepreke</span>
+            <span style="display:flex;gap:12px;">
+              <label style="font-weight:normal;display:flex;align-items:center;gap:3px;"><input type="radio" name="2-prepreka" value="DA"> DA</label>
+              <label style="font-weight:normal;display:flex;align-items:center;gap:3px;"><input type="radio" name="2-prepreka" value="NE"> NE</label>
+            </span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>5 promjera od zadnje prepreke</span>
+            <span style="display:flex;gap:12px;">
+              <label style="font-weight:normal;display:flex;align-items:center;gap:3px;"><input type="radio" name="5-zadnja" value="DA"> DA</label>
+              <label style="font-weight:normal;display:flex;align-items:center;gap:3px;"><input type="radio" name="5-zadnja" value="NE"> NE</label>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KOTAO / PLAMENIK -->
+  <div class="section">
+    <div class="section-body">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr>
+            <th style="width:30%;border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;"></th>
+            <th style="border:1px solid #ccc;padding:4px 8px;background:#d0d0d0;text-align:center;font-size:14px;">Kotao</th>
+            <th style="border:1px solid #ccc;padding:4px 8px;background:#d0d0d0;text-align:center;font-size:14px;">Plamenik</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">Proizvođač</td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="kotao-proizvođač" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="plamenik-proizvođač" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">Tip i oznaka</td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="kotao-tip" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="plamenik-tip" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">Tvornički broj</td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="kotao-tvornicki" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="plamenik-tvornicki" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">Godina proizvodnje</td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="kotao-godina" type="number" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 6px;"><input id="plamenik-godina" type="number" style="width:100%;border:none;outline:none;font-size:13px;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MJERNA OPREMA -->
+  <div class="section grow">
+    <div class="section-title">Mjerna oprema</div>
+    <div class="section-body">
+      <div style="padding:6px 8px;display:flex;gap:20px;border-bottom:1px solid #ccc;">
+        <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="uredjaj-ga5000"> Madur GA40 T plus</label>
+        <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="uredjaj-photon"> Madur Photon II</label>
+        <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="uredjaj-kimo"> KIMO MP105</label>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr>
+            <th style="border:1px solid #ccc;padding:4px 6px;background:#f5f5f5;width:8%;"></th>
+            <th style="border:1px solid #ccc;padding:4px 6px;background:#f5f5f5;">span plin, ppm</th>
+            <th style="border:1px solid #ccc;padding:4px 6px;background:#f5f5f5;">prije mjerenja, ppm</th>
+            <th style="border:1px solid #ccc;padding:4px 6px;background:#f5f5f5;">poslije mjerenja, ppm</th>
+            <th style="border:1px solid #ccc;padding:4px 6px;background:#f5f5f5;" colspan="2">korekcija</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;text-align:center;">CO</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="co-span" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="co-prije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="co-poslije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="co-kor" value="DA"> DA</label></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="co-kor" value="NE"> NE</label></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;text-align:center;">NO</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="no-span" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="no-prije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="no-poslije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="no-kor" value="DA"> DA</label></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="no-kor" value="NE"> NE</label></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;text-align:center;">SO2</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="so2-span" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="so2-prije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="so2-poslije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="so2-kor" value="DA"> DA</label></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="so2-kor" value="NE"> NE</label></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:3px 6px;font-weight:bold;text-align:center;">O2</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="o2-span" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="o2-prije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input id="o2-poslije" style="width:100%;border:none;outline:none;font-size:12px;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="o2-kor" value="DA"> DA</label></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;text-align:center;"><label style="font-weight:normal;display:flex;align-items:center;gap:3px;justify-content:center;"><input type="radio" name="o2-kor" value="NE"> NE</label></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex;gap:16px;padding:5px 8px;border-top:1px solid #ccc;flex-wrap:wrap;align-items:center;">
+        <label style="font-weight:bold;">Plinotjesnost, (&gt;50 kPA):</label>
+        <input id="plinotjesnost" style="width:80px;border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;">
+        <label style="font-weight:bold;">Početak mjerenja:</label>
+        <input id="pocetak-mjerenja" type="time" style="border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;">
+        <label style="font-weight:bold;">Kraj mjerenja:</label>
+        <input id="kraj-mjerenja" type="time" style="border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;">
+        <label style="font-weight:bold;">Naziv file s podacima:</label>
+        <input id="naziv-filea" style="flex:1;min-width:120px;border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer" style="display:flex;justify-content:space-between;font-size:11px;color:#555;">
+    <span><strong>ZM-04 – 3.5</strong> - 9.12.2015.</span>
+    <span>str 1/2</span>
+  </div>
+</div>
+
+<!-- ===== STRANICA 2 ===== -->
+<div class="page" id="page2">
+
+  <!-- BRZINA STRUJANJA -->
+  <div class="section">
+    <div class="section-title">Brzina strujanja</div>
+    <div class="section-body">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tbody>
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;width:22%;background:#f5f5f5;">Pozicija mjerne točke [cm]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-poz" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-poz" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-poz" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-poz" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-poz" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-poz" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;background:#f5f5f5;">Tlak [Pa]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-tlak" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-tlak" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-tlak" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-tlak" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-tlak" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-tlak" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;background:#f5f5f5;">Brzina [m/s]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-brzina" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-brzina" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-brzina" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-brzina" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-brzina" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="bs-brzina" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PARAMETRI MJERENJA EMISIJA -->
+  <div class="section">
+    <div class="section-title">Parametri mjerenja emisija</div>
+    <div class="section-body">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr>
+            <th style="border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;width:22%;"></th>
+            <th style="border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;text-align:center;">1</th>
+            <th style="border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;text-align:center;">2</th>
+            <th style="border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;text-align:center;">3</th>
+            <th style="border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;text-align:center;">4</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">T okoline [°C]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tok" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tok" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tok" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tok" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">T plinova [°C]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tpl" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tpl" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tpl" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-tpl" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">O₂ [%]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-o2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-o2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-o2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-o2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">NO<sub>x</sub> [ppm]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-nox" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-nox" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-nox" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-nox" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">SO₂ [ppm]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-so2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-so2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-so2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-so2" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">CO [ppm]</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-co" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-co" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-co" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-co" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">Dimni broj</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-dimni" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-dimni" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-dimni" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-dimni" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+          <tr><td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;">Vrijeme</td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-vrij" type="time" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-vrij" type="time" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-vrij" type="time" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+            <td style="border:1px solid #ccc;padding:2px 4px;"><input class="pm-vrij" type="time" style="width:100%;border:none;outline:none;font-size:13px;text-align:center;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PROVJERA MJERNE OPREME -->
+  <div class="section">
+    <div style="background:#d0d0d0;font-weight:bold;font-size:13px;padding:5px 8px;text-align:center;border-bottom:1px solid #000;">
+      Provjera mjerne opreme po završetku mjerenja prema POP-04
+    </div>
+    <div style="padding:7px 10px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+      <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="provjera-nije"> provjera nije obavljena</label>
+      <label style="font-weight:normal;display:flex;align-items:center;gap:4px;">
+        <input type="checkbox" id="provjera-obavljena"> provjera obavljena u
+        <input id="provjera-sati" style="width:60px;border:none;border-bottom:1px solid #aaa;outline:none;font-size:13px;margin:0 4px;" type="time"> sati
+      </label>
+      <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="provjera-bez"> bez primjedbi</label>
+      <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="provjera-primjedba"> primjedba (u komentaru)</label>
+    </div>
+  </div>
+
+  <!-- KOMENTAR -->
+  <div class="section grow">
+    <div style="background:#d0d0d0;font-weight:bold;font-size:13px;padding:5px 8px;text-align:center;border-bottom:1px solid #000;">Komentar</div>
+    <div style="padding:6px 8px;flex:1;display:flex;flex-direction:column;">
+      <textarea id="komentar" style="width:100%;flex:1;border:none;outline:none;font-size:13px;font-family:Arial,sans-serif;resize:none;"></textarea>
+    </div>
+  </div>
+
+  <!-- ISPITIVAČI -->
+  <div class="section">
+    <div style="background:#d0d0d0;font-weight:bold;font-size:13px;padding:5px 8px;text-align:center;border-bottom:1px solid #000;">Ispitivači</div>
+    <div style="display:flex;">
+      <div style="flex:1;padding:8px 12px;border-right:1px solid #ccc;text-align:center;">
+        <div style="font-weight:bold;font-size:12px;margin-bottom:20px;">Voditelj ispitivanja</div>
+        <div style="border-top:1px solid #000;margin-top:30px;padding-top:4px;">
+          <input id="voditelj" style="border:none;outline:none;font-size:13px;text-align:center;width:100%;" placeholder="Ime i prezime">
+        </div>
+      </div>
+      <div style="flex:1;padding:8px 12px;border-right:1px solid #ccc;text-align:center;">
+        <div style="font-weight:bold;font-size:12px;margin-bottom:20px;">Ispitivač 1</div>
+        <div style="border-top:1px solid #000;margin-top:30px;padding-top:4px;">
+          <input id="ispitivac1" style="border:none;outline:none;font-size:13px;text-align:center;width:100%;" placeholder="Ime i prezime">
+        </div>
+      </div>
+      <div style="flex:1;padding:8px 12px;text-align:center;">
+        <div style="font-weight:bold;font-size:12px;margin-bottom:20px;">Ispitivač 2</div>
+        <div style="border-top:1px solid #000;margin-top:30px;padding-top:4px;">
+          <input id="ispitivac2" style="border:none;outline:none;font-size:13px;text-align:center;width:100%;" placeholder="Ime i prezime">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer" style="display:flex;justify-content:space-between;font-size:11px;color:#555;">
+    <span><strong>ZM-04 – 3.5</strong> - 9.12.2015.</span>
+    <span>str 2/2</span>
+  </div>
+</div>
+
+<script>
+function pokupiPodatke() {
+  const data = {};
+  document.querySelectorAll('input[id], textarea[id]').forEach(el => {
+    data[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+  ['tip-izvora','oblik-dimnjace','5-vrh','2-prepreka','5-zadnja','co-kor','no-kor','so2-kor','o2-kor'].forEach(name => {
+    const c = document.querySelector(`input[name="${name}"]:checked`);
+    data['radio_' + name] = c ? c.value : '';
+  });
+  ['bs-poz','bs-tlak','bs-brzina','pm-tok','pm-tpl','pm-o2','pm-nox','pm-so2','pm-co','pm-dimni','pm-vrij'].forEach(cl => {
+    data['arr_' + cl] = Array.from(document.querySelectorAll('.' + cl)).map(e => e.value);
+  });
+  return data;
+}
+function popuniPodatke(data) {
+  document.querySelectorAll('input[id], textarea[id]').forEach(el => {
+    if (data[el.id] !== undefined) { if (el.type === 'checkbox') el.checked = data[el.id]; else el.value = data[el.id]; }
+  });
+  ['tip-izvora','oblik-dimnjace','5-vrh','2-prepreka','5-zadnja','co-kor','no-kor','so2-kor','o2-kor'].forEach(name => {
+    const val = data['radio_' + name];
+    if (val) { const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if (el) el.checked = true; }
+  });
+  ['bs-poz','bs-tlak','bs-brzina','pm-tok','pm-tpl','pm-o2','pm-nox','pm-so2','pm-co','pm-dimni','pm-vrij'].forEach(cl => {
+    const arr = data['arr_' + cl];
+    if (arr) document.querySelectorAll('.' + cl).forEach((el, i) => { if (arr[i] !== undefined) el.value = arr[i]; });
+  });
+}
+function spremiPodatke() {
+  const data = pokupiPodatke();
+  const naziv = (document.getElementById('naziv-tvrtke').value || 'zm04').replace(/[^a-zA-Z0-9_\-]/g, '_');
+  const datum = document.getElementById('datum-mjerenja').value || new Date().toISOString().split('T')[0];
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `ZM04_${naziv}_${datum}.json`; a.click();
+}
+function ucitajPodatke() {
+  const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => { try { popuniPodatke(JSON.parse(ev.target.result)); } catch(err) { alert('Greška pri učitavanju.'); } };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+</script>
+</body>
+</html>
