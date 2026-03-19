@@ -65,10 +65,10 @@ body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f0f0; col
 /* Table-like rows */
 .form-row { display: flex; border-bottom: 1px solid #ccc; min-height: 28px; }
 .form-row:last-child { border-bottom: none; }
-.form-cell { flex: 1; padding: 5px 6px; border-right: 1px solid #ccc; display: flex; align-items: center; gap: 4px; min-width: 0; }
+.form-cell { flex: 1; padding: 5px 6px; border-right: 1px solid #ccc; display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
 .form-cell:last-child { border-right: none; }
-.form-cell label { font-weight: bold; white-space: nowrap; font-size: 12px; }
-.form-cell input, .form-cell textarea { border: none; border-bottom: 1px solid #aaa; flex: 1; font-size: 13px; outline: none; background: transparent; min-width: 0; max-width: 100%; font-family: Arial, sans-serif; }
+.form-cell label { font-weight: bold; white-space: nowrap; font-size: 12px; flex-shrink: 0; }
+.form-cell input, .form-cell textarea { border: none; border-bottom: 1px solid #aaa; flex: 1; font-size: 13px; outline: none; background: transparent; min-width: 0; width: 0; font-family: Arial, sans-serif; overflow: hidden; text-overflow: ellipsis; }
 .form-cell textarea { resize: none; height: 22px; }
 </style>
 </head>
@@ -198,7 +198,7 @@ body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f0f0; col
   <!-- KOTAO / PLAMENIK -->
   <div class="section">
     <div class="section-body">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;">
         <thead>
           <tr>
             <th style="width:30%;border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;"></th>
@@ -241,7 +241,7 @@ body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f0f0; col
         <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="uredjaj-photon"> Madur Photon II</label>
         <label style="font-weight:normal;display:flex;align-items:center;gap:4px;"><input type="checkbox" id="uredjaj-kimo"> KIMO MP105</label>
       </div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;">
         <thead>
           <tr>
             <th style="border:1px solid #ccc;padding:4px 6px;background:#f5f5f5;width:8%;"></th>
@@ -312,7 +312,7 @@ body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f0f0; col
   <div class="section">
     <div class="section-title">Brzina strujanja</div>
     <div class="section-body">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;">
         <tbody>
           <tr>
             <td style="border:1px solid #ccc;padding:4px 8px;font-weight:bold;width:22%;background:#f5f5f5;">Pozicija mjerne točke [cm]</td>
@@ -350,7 +350,7 @@ body { font-family: Arial, sans-serif; font-size: 13px; background: #f0f0f0; col
   <div class="section">
     <div class="section-title">Parametri mjerenja emisija</div>
     <div class="section-body">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;">
         <thead>
           <tr>
             <th style="border:1px solid #ccc;padding:4px 8px;background:#f5f5f5;width:22%;"></th>
